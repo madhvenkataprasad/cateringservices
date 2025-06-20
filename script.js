@@ -1,21 +1,29 @@
+// Prevent multiple navigation clicks
+let isNavigating = false;
+
 function goBack() {
-    window.history.back();
+    if (isNavigating) {
+        console.log('Navigation in progress, ignoring back click');
+        return;
+    }
+    isNavigating = true;
+    console.log('Navigating back to:', document.referrer || 'index.html');
+    const previousPage = document.referrer.includes(window.location.hostname) ?
+        new URL(document.referrer).pathname :
+        '/index.html';
+    window.location.href = previousPage;
 }
 
+// Handle popstate for back/forward navigation
+window.addEventListener('popstate', function(event) {
+    const url = event.state ? .page || 'index.html';
+    console.log('Popstate triggered, navigating to:', url);
+    window.location.href = url;
+});
+
+// Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded:', window.location.pathname);
-
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.style.display = 'none';
-    }
-
-    // Loader animation when clicking any <a>
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', function() {
-            if (loadingOverlay) {
-                loadingOverlay.style.display = 'flex';
-            }
-        });
-    });
+    history.replaceState({ page: window.location.pathname }, '', window.location.pathname);
+    isNavigating = false;
 });
