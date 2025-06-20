@@ -35,140 +35,147 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 {
                     name: "Tasty Treats",
-                    lat: 40.6782,
-                    lon: -73.9442,
-                    cuisine: "Indian",
-                    menuItems: ["ButterChicken", "NaanBread", "MangoLassi", "SambarDosa"],
+                    lat: 40.7306,
+                    lon: -73.9352,
+                    cuisine: "American",
+                    menuItems: ["Burgers", "Fries", "Milkshakes"],
                     rating: 4.3
                 },
                 {
-                    name: "South Spice",
-                    lat: 40.6782,
-                    lon: -73.9442,
+                    name: "Spice Route",
+                    lat: 40.7580,
+                    lon: -73.9855,
                     cuisine: "Indian",
-                    menuItems: ["MasalaDosa", "IdliSambar", "Biryani"],
-                    rating: 4.1
+                    menuItems: ["ButterChicken", "Naan", "Samosa"],
+                    rating: 4.7
                 },
                 {
-                    name: "Savory Events",
-                    lat: 40.7549,
-                    lon: -73.9840,
-                    cuisine: "Mexican",
-                    menuItems: ["TacosAlPastor", "Guacamole", "Churros"],
-                    rating: 4.4
-                },
-                {
-                    name: "Dragon Feast",
-                    lat: 40.7178,
-                    lon: -73.9990,
-                    cuisine: "Chinese",
-                    menuItems: ["KungPaoChicken", "FriedRice", "SpringRolls"],
-                    rating: 4.0
-                },
-                {
-                    name: "Burger Bonanza",
-                    lat: 40.7000,
-                    lon: -73.9500,
-                    cuisine: "American",
-                    menuItems: ["Cheeseburger", "FrenchFries", "Milkshake"],
-                    rating: 3.9
-                },
-                {
-                    name: "Ocean Delights",
-                    lat: 40.7050,
-                    lon: -74.0080,
-                    cuisine: "Japanese",
-                    menuItems: ["SushiRoll", "Ramen", "Mochi"],
+                    name: "Curry House",
+                    lat: 40.7580,
+                    lon: -73.9855,
+                    cuisine: "Indian",
+                    menuItems: ["PaneerTikka", "Biryani", "GulabJamun"],
                     rating: 4.6
                 },
                 {
-                    name: "Spice Haven",
-                    lat: 40.7200,
-                    lon: -73.9900,
+                    name: "Taco Express",
+                    lat: 34.0522,
+                    lon: -118.2437,
+                    cuisine: "Mexican",
+                    menuItems: ["Tacos", "Burritos", "Quesadillas"],
+                    rating: 4.1
+                },
+                {
+                    name: "Dragon Wok",
+                    lat: 34.0522,
+                    lon: -118.2437,
+                    cuisine: "Chinese",
+                    menuItems: ["ChowMein", "SpringRolls", "DimSum"],
+                    rating: 4.4
+                },
+                {
+                    name: "Sushi Master",
+                    lat: 34.0522,
+                    lon: -118.2437,
+                    cuisine: "Japanese",
+                    menuItems: ["Sushi", "Sashimi", "Tempura"],
+                    rating: 4.9
+                },
+                {
+                    name: "Thai Delight",
+                    lat: 34.0522,
+                    lon: -118.2437,
                     cuisine: "Thai",
-                    menuItems: ["PadThai", "GreenCurry", "MangoStickyRice"],
+                    menuItems: ["PadThai", "GreenCurry", "TomYumSoup"],
                     rating: 4.5
                 }
             ];
 
-            function haversineDistance(lat1, lon1, lat2, lon2) {
-                const R = 6371;
-                const dLat = (lat2 - lat1) * Math.PI / 180;
-                const dLon = (lon2 - lon1) * Math.PI / 180;
-                const a =
-                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                return R * c;
-            }
-
-            function normalizeItem(item) {
-                return item.replace(/\s+/g, '').toLowerCase();
-            }
-
-            const form = document.getElementById('locationForm');
+            const locationForm = document.getElementById('locationForm');
             const resultText = document.getElementById('resultText');
             const serviceList = document.getElementById('serviceList');
 
-            if (!form || !resultText || !serviceList) {
-                console.error('Required DOM elements not found:', { form, resultText, serviceList });
+            if (!locationForm || !resultText || !serviceList) {
+                console.error('Required DOM elements not found:', {
+                    locationForm,
+                    resultText,
+                    serviceList
+                });
                 return;
             }
 
-            form.addEventListener('submit', function(event) {
+            locationForm.addEventListener('submit', function(event) {
                         event.preventDefault();
-                        console.log('Form submitted');
 
-                        const userLat = parseFloat(document.getElementById('latitude').value);
-                        const userLon = parseFloat(document.getElementById('longitude').value);
-                        const selectedCuisine = document.getElementById('cuisine').value;
+                        const latitude = parseFloat(document.getElementById('latitude').value);
+                        const longitude = parseFloat(document.getElementById('longitude').value);
+                        const cuisine = document.getElementById('cuisine').value;
                         const menuItemsInput = document.getElementById('menuItemsInput').value;
-                        const requestedItems = menuItemsInput.split(',').map(item => item.trim()).filter(item => item);
+                        const requestedItems = menuItemsInput ?
+                            menuItemsInput.split(',').map(item => item.trim()) : [];
 
-                        if (isNaN(userLat) || isNaN(userLon)) {
-                            resultText.textContent = 'Please enter valid latitude and longitude values.';
-                            serviceList.innerHTML = '';
-                            return;
+                        function haversineDistance(lat1, lon1, lat2, lon2) {
+                            const R = 6371; // Radius of Earth in kilometers
+                            const dLat = (lat2 - lat1) * Math.PI / 180;
+                            const dLon = (lon2 - lon1) * Math.PI / 180;
+                            const a =
+                                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                            return R * c;
                         }
 
-                        if (userLat < -90 || userLat > 90 || userLon < -180 || userLon > 180) {
-                            resultText.textContent = 'Latitude must be -90 to 90, longitude -180 to 180.';
-                            serviceList.innerHTML = '';
-                            return;
-                        }
+                        let nearestServices = cateringServices
+                            .map(service => {
+                                const distance = haversineDistance(latitude, longitude, service.lat, service.lon);
+                                let matches = 0;
+                                if (requestedItems.length > 0) {
+                                    matches = requestedItems.filter(item =>
+                                        service.menuItems.includes(item)
+                                    ).length;
+                                }
+                                return {
+                                    service,
+                                    distance,
+                                    matches
+                                };
+                            })
+                            .filter(
+                                ({
+                                    distance,
+                                    service
+                                }) =>
+                                distance <= 30 &&
+                                (cuisine === "" || service.cuisine === cuisine)
+                            )
+                            .sort((a, b) => {
+                                // Primary sort: by number of matching menu items (descending)
+                                if (b.matches !== a.matches) {
+                                    return b.matches - a.matches;
+                                }
+                                // Secondary sort: by distance (ascending)
+                                return a.distance - b.distance;
+                            });
 
-                        let validServices = [];
-                        let maxMatches = 0;
-                        let minDistance = Infinity;
+                        if (nearestServices.length > 0) {
+                            const maxMatches = nearestServices[0].matches;
+                            const minDistance = nearestServices[0].distance;
 
-                        cateringServices.forEach(service => {
-                            if (isNaN(service.lat) || isNaN(service.lon)) return;
-                            if (selectedCuisine && service.cuisine !== selectedCuisine) return;
+                            const matchingServices = nearestServices.filter(
+                                ({
+                                    matches,
+                                    distance
+                                }) =>
+                                matches === maxMatches && Math.abs(distance - minDistance) < 0.01
+                            );
 
-                            const distance = haversineDistance(userLat, userLon, service.lat, service.lon);
-                            if (distance > 30) return;
-
-                            const matches = requestedItems.length > 0 ?
-                                requestedItems.filter(item => {
-                                    const normalizedInput = normalizeItem(item);
-                                    return service.menuItems.some(menuItem => normalizeItem(menuItem) === normalizedInput);
-                                }).length :
-                                service.menuItems.length;
-
-                            validServices.push({ service, matches, distance });
-                            maxMatches = Math.max(maxMatches, matches);
-                            minDistance = Math.min(minDistance, distance);
-                        });
-
-                        const matchingServices = validServices.filter(
-                            ({ matches, distance }) =>
-                            matches === maxMatches && Math.abs(distance - minDistance) < 0.01
-                        );
-
-                        if (matchingServices.length > 0 && (requestedItems.length === 0 || maxMatches > 0)) {
-                            resultText.textContent = `Found ${matchingServices.length} catering service(s) matching your criteria:`;
-                            serviceList.innerHTML = matchingServices.map(({ service, distance }) => `
+                            if (matchingServices.length > 0 && (requestedItems.length === 0 || maxMatches > 0)) {
+                                resultText.textContent = `Found ${matchingServices.length} catering service(s) matching your criteria:`;
+                                serviceList.innerHTML = matchingServices.map(({
+                                            service,
+                                            distance
+                                        }) => `
                 <li class="service-details">
                     <strong>${service.name}</strong> - ${distance.toFixed(2)} km away<br>
                     <strong>Cuisine:</strong> ${service.cuisine}<br>
@@ -177,18 +184,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     <ul>${service.menuItems.map(item => `<li>${item}</li>`).join('')}</ul>
                 </li>
             `).join('');
+            } else {
+                resultText.textContent = 'No catering services found within 30 km that match your criteria.';
+                serviceList.innerHTML = '';
+                console.log('No services found, redirecting to contact.html');
+                // Use the global showLoading function from script.js
+                showLoading('contact.html');
+            }
         } else {
             resultText.textContent = 'No catering services found within 30 km that match your criteria.';
             serviceList.innerHTML = '';
             console.log('No services found, redirecting to contact.html');
+            // Use the global showLoading function from script.js
             showLoading('contact.html');
         }
     });
-
-    function showLoading(url) {
-        resultText.textContent = "Redirecting...";
-        setTimeout(() => {
-            window.location.href = url;
-        }, 1500);
-    }
 });
