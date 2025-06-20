@@ -36,11 +36,11 @@ window.addEventListener('popstate', function(event) {
     // this event fires. We reload the page corresponding to the new state.
     if (event.state && event.state.page) {
         console.log('Popstate triggered, navigating to:', event.state.page);
-        window.location.href = event.state.page; //
+        window.location.href = event.state.page;
     } else {
         // Fallback for cases where state might be null (e.g., initial page load, or navigating beyond history)
         console.log('Popstate triggered with no state, defaulting to current path.');
-        window.location.href = window.location.pathname; //
+        window.location.href = window.location.pathname;
     }
 });
 
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Page loaded:', window.location.pathname);
     // Replace the current history entry with one that explicitly includes the page URL.
     // This ensures consistent behavior when navigating back/forward.
-    history.replaceState({ page: window.location.pathname }, '', window.location.pathname); //
+    history.replaceState({ page: window.location.pathname }, '', window.location.pathname);
     const loadingOverlay = document.getElementById('loadingOverlay');
     if (loadingOverlay) {
         loadingOverlay.style.display = 'none'; // Ensure overlay is hidden on page load

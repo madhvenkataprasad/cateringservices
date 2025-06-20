@@ -189,14 +189,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 serviceList.innerHTML = '';
                 console.log('No services found, redirecting to contact.html');
                 // Use the global showLoading function from script.js
-                showLoading('contact.html');
+                showLoading('contact.html'); // Call the global showLoading
             }
         } else {
             resultText.textContent = 'No catering services found within 30 km that match your criteria.';
             serviceList.innerHTML = '';
             console.log('No services found, redirecting to contact.html');
             // Use the global showLoading function from script.js
-            showLoading('contact.html');
+            showLoading('contact.html'); // Call the global showLoading
         }
     });
 });
